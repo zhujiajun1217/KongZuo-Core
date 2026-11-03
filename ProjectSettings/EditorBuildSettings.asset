@@ -14,15 +14,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/KongZuo/Scenes/02_Chapter01.unity
     guid: 209fe47d0b39cf44aa9f4b626a3a6b87
-  - enabled: 1
-    path: Assets/KongZuo/V03/Scenes/V03_00_Prologue.unity
-    guid: 64cfc54aaabb99841bfbc99f28185f57
-  - enabled: 1
-    path: Assets/KongZuo/V03/Scenes/V03_01_Seat.unity
-    guid: af596e3ad55b511449a7df3a1b4d3873
-  - enabled: 1
-    path: Assets/KongZuo/V03/Scenes/V03_02_Person.unity
-    guid: fe6ce80c77a2459498373f96e5bcaa6d
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

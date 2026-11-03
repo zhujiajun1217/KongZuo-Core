@@ -43,7 +43,7 @@ def csharp_delimiters(text, file):
     assert state in ("code","line"), (file,"unterminated literal/comment",state)
     depth=0
     for l in text.splitlines():
-        st=l.strip()
+        st=l.lstrip("\ufeff").strip()
         if st.startswith("#if"): depth+=1
         if st.startswith("#endif"): depth-=1
         assert depth>=0,(file,"unexpected #endif")
@@ -61,8 +61,9 @@ ids=set(re.findall(r'const string\s+(\w+)\s*=',CS["KZFlags"]))
 for n,src in CS.items():
     for found in re.findall(r"\bKZFlags\.(\w+)",src):
         assert found in ids,(n,"unknown flag",found)
-action_enum=set(re.findall(r"\b(Worksheet|FrontDoor|Phone|Seat07|Register|Program|Ritual|OldPhoto|Ticket|SeatPuzzle|BackstageDoor|Poster)\b",
-                           CS["KZInteractable"].split("public enum KZActionKind")[1].split("}")[0]))
+action_enum_body=re.search(
+    r"public enum KZActionKind\s*\{([^}]*)\}",CS["KZInteractable"]).group(1)
+action_enum=set(re.findall(r"\b[A-Za-z_]\w*\b",action_enum_body))
 for n,src in CS.items():
     for found in re.findall(r"\bKZActionKind\.(\w+)",src):
         assert found in action_enum,(n,"unknown action",found)

@@ -23,7 +23,7 @@ namespace KongZuo.EditorTools
         private static GameObject frontDoor;
         private static GameObject seat07;
 
-        [MenuItem("空座/01 生成第四周P0灰盒场景")]
+        [MenuItem("空座/01 生成主线P0灰盒场景")]
         public static void CreateGreyboxScenes()
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
