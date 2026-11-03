@@ -1,0 +1,32 @@
+# KongZuo P0 | Restored from the original unmodified 01_Exterior__PLASTER.obj
+# Coordinates preserved in Unity metres; matching original face winding and UV indices
+o 01_Exterior__PLASTER__RearWall
+usemtl PLASTER
+v -10.00000 0.00000 17.82500
+v 10.00000 0.00000 17.82500
+v 10.00000 4.70000 17.82500
+v -10.00000 4.70000 17.82500
+v -10.00000 0.00000 18.17500
+v 10.00000 0.00000 18.17500
+v 10.00000 4.70000 18.17500
+v -10.00000 4.70000 18.17500
+vt 0.00000 0.00000
+vt 0.00000 0.00000
+vt 0.00000 0.00000
+vt 0.00000 0.00000
+vt 0.00000 0.00000
+vt 0.00000 0.00000
+vt 0.00000 0.00000
+vt 0.00000 0.00000
+f 1/1 3/3 2/2
+f 1/1 4/4 3/3
+f 5/5 6/6 7/7
+f 5/5 7/7 8/8
+f 1/1 2/2 6/6
+f 1/1 6/6 5/5
+f 2/2 3/3 7/7
+f 2/2 7/7 6/6
+f 3/3 4/4 8/8
+f 3/3 8/8 7/7
+f 4/4 1/1 5/5
+f 4/4 5/5 8/8

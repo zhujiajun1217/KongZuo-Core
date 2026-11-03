@@ -1,0 +1,14 @@
+# KONG ZU OPERA HOUSE - V0.3 P0 - Unity metre coordinates
+mtllib KZ_P0_Materials.mtl
+o 02_FrontRooms__SIGN_LEDGER
+usemtl SIGN_LEDGER
+v -6.22000 1.27500 -13.19000
+v -7.08000 1.27500 -13.19000
+v -7.08000 2.38500 -13.19000
+v -6.22000 2.38500 -13.19000
+vt 0.00000 0.00000
+vt 1.00000 0.00000
+vt 1.00000 1.00000
+vt 0.00000 1.00000
+f 1/1 2/2 3/3
+f 1/1 3/3 4/4
