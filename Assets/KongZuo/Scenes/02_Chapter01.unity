@@ -39527,9 +39527,9 @@ MonoBehaviour:
   - {fileID: 1803863378}
   - {fileID: 81576796}
   - {fileID: 1075626046}
-  maxViewDistance: 2.4
-  maxViewportError: 0.075
-  requiredHoldSeconds: 0.8
+  maxViewDistance: 3.5
+  maxViewportError: 0.12
+  requiredHoldSeconds: 0.35
   occlusionMask:
     serializedVersion: 2
     m_Bits: 4294967295

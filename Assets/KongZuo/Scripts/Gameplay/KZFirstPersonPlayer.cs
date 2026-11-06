@@ -45,6 +45,23 @@ namespace KongZuo
             if (eye != null) eye.localRotation = Quaternion.identity;
         }
 
+        public void TeleportView(Vector3 cameraPosition, Quaternion cameraRotation)
+        {
+            if (eye == null)
+            {
+                Teleport(cameraPosition, cameraRotation);
+                return;
+            }
+            Vector3 forward = cameraRotation * Vector3.forward;
+            float yaw = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
+            float viewPitch = -Mathf.Asin(Mathf.Clamp(forward.y, -1f, 1f)) * Mathf.Rad2Deg;
+            Quaternion bodyRotation = Quaternion.Euler(0f, yaw, 0f);
+            Vector3 rootPosition = cameraPosition - bodyRotation * eye.localPosition;
+            Teleport(rootPosition, bodyRotation);
+            pitch = Mathf.Clamp(viewPitch, -82f, 82f);
+            eye.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+        }
+
         private void Awake()
         {
             controller = GetComponent<CharacterController>();

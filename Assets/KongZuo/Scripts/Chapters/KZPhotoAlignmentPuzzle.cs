@@ -8,9 +8,9 @@ namespace KongZuo
         public Camera viewCamera;
         public Transform referenceView;
         public Transform[] landmarks;
-        [Min(0.5f)] public float maxViewDistance = 2.4f;
-        [Range(.01f, .2f)] public float maxViewportError = .075f;
-        [Min(.05f)] public float requiredHoldSeconds = .8f;
+        [Min(0.5f)] public float maxViewDistance = 3.5f;
+        [Range(.01f, .2f)] public float maxViewportError = .12f;
+        [Min(.05f)] public float requiredHoldSeconds = .35f;
         public LayerMask occlusionMask = ~0;
 
         private KZGameSession session;
@@ -44,7 +44,8 @@ namespace KongZuo
                 active = !active;
                 IsAnyActive = active;
                 hold = 0f;
-                feedback = active ? "站在旧照片拍摄位置，调整视线，让三处标记对齐。" : "";
+                if (active) SnapToReferenceView();
+                feedback = active ? "已回到旧照片拍摄点，保持视线片刻即可完成对位。" : "";
             }
             if (!active) return;
             if (KZInput.ConsumeEscape())
@@ -71,6 +72,14 @@ namespace KongZuo
             KZAudioFeedback.PlayCue(KZSoundCue.PuzzleSuccess);
         }
 
+        private void SnapToReferenceView()
+        {
+            if (viewCamera == null || referenceView == null) return;
+            KZFirstPersonPlayer player = viewCamera.GetComponentInParent<KZFirstPersonPlayer>();
+            if (player == null) return;
+            player.TeleportView(referenceView.position, referenceView.rotation);
+        }
+
         public bool Matches(out float maxError)
         {
             maxError = float.PositiveInfinity;
@@ -94,16 +103,10 @@ namespace KongZuo
                     target.y <= .02f || target.y >= .98f ||
                     actual.x <= .02f || actual.x >= .98f ||
                     actual.y <= .02f || actual.y >= .98f) return false;
-                float distance = Vector3.Distance(viewCamera.transform.position, landmark.position);
-                RaycastHit[] hits = Physics.RaycastAll(viewCamera.transform.position,
-                    (landmark.position - viewCamera.transform.position).normalized,
-                    distance - .15f, occlusionMask, QueryTriggerInteraction.Ignore);
-                foreach (RaycastHit hit in hits)
-                {
-                    if (hit.collider.GetComponentInParent<KZFirstPersonPlayer>() != null) continue;
-                    // The marker sits on the visible column or stair surface.
-                    if (hit.distance < distance - .85f) return false;
-                }
+                // The imported opera-house model uses broad collision meshes around seats and
+                // stage trim. Ray tests therefore reported a false occlusion even while the
+                // on-screen landmark dot was visibly aligned with its target. Viewport matching
+                // is the actual puzzle action and is sufficient for this authored camera pose.
                 maxError = Mathf.Max(maxError, Vector2.Distance(target, actual));
             }
             return maxError <= maxViewportError;
