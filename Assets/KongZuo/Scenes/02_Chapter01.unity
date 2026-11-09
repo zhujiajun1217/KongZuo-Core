@@ -2116,7 +2116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KongZuo.KZInteractable
   action: 9
   displayName: "\u4E00\u6392\u5EA7\u6B21\u793A\u610F\u56FE"
-  body: "\u9009\u62E9\u4EBA\u7269\u5361\uFF0C\u6062\u590D\u7B2C\u4E00\u6392\u90E8\u5206\u5EA7\u6B21\u3002"
+  body: "\u793A\u610F\u56FE\u4E0A\u7B2C\u4E00\u6392\u4E2D\u592E\u7684\u4E03\u53F7\u4F4D\u7F6E\u6CA1\u6709\u6807\u8BB0\u3002\u7EB8\u8FB9\u65E7\u6CE8\uFF1A\u7559\u5EA7\u620F\u671F\u95F4\uFF0C\u4E2D\u592E\u5EA7\u4F4D\u4E0D\u53EF\u5750\u4EBA\u3002"
 --- !u!23 &124509800
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2656,6 +2656,37 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 6.4, y: 0.46, z: -11.2}
   m_LocalScale: {x: 1.75, y: 0.92, z: 1.35}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &181209424
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 181209425}
+  m_Layer: 0
+  m_Name: KZ_Scene_Adapted_Art02_20261106_FullPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &181209425
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 181209424}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -7526,37 +7557,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 440691460}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &444325866
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 444325867}
-  m_Layer: 0
-  m_Name: KZ_Scene_Adapted_From11_20261102
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &444325867
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 444325866}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &445431027
 GameObject:
   m_ObjectHideFlags: 0
@@ -9140,86 +9140,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 536197645}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1001 &536204123
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6980710590115553588, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8373832179076977242, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      propertyPath: m_Name
-      value: KZ_OperaHouse_P0_V03_From11_Integrated
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1170479331977131629, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 536204125}
-  m_SourcePrefab: {fileID: 100100000, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
---- !u!1 &536204124 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1170479331977131629, guid: b8f3bbdb2e78f6448a493757711ca363, type: 3}
-  m_PrefabInstance: {fileID: 536204123}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &536204125
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 536204124}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 773b9b5066a144f44989a5d14983235f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KongZuo.KZInteractable
-  action: 3
-  displayName: "\u7B2C\u4E00\u6392\u4E03\u5EA7"
-  body: "\u6905\u80CC\u523B\u7740\uFF1A\u4E00\u6392\u4E03\u5EA7\u3002\n\n\u5176\u4ED6\u5EA7\u9762\u5E03\u6EE1\u7070\u5C18\uFF0C\u552F\u72EC\u8FD9\u91CC\u770B\u4E0A\u53BB\u5E72\u51C0\u4E00\u4E9B\u3002\n\u4E5F\u8BB8\u53EF\u4EE5\u53BB\u552E\u7968\u5904\u627E\u65E7\u8BB0\u5F55\u6838\u5BF9\u3002"
 --- !u!1 &544580588
 GameObject:
   m_ObjectHideFlags: 0
@@ -15617,6 +15537,106 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 899497770}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &899766361
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1655034640484464130, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2617335912776364710, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4088696844770859463, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 8103686996711970863, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8791354829395931536, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3679007082418259465, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8230606248044232032, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      propertyPath: m_Name
+      value: KZ_OperaHouse_P0_V03_From11_Integrated
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 954871798470506816, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 899766363}
+  m_SourcePrefab: {fileID: 100100000, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+--- !u!1 &899766362 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 954871798470506816, guid: 5df42f0035be8b445ab3a77ed0062661, type: 3}
+  m_PrefabInstance: {fileID: 899766361}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &899766363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 899766362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 773b9b5066a144f44989a5d14983235f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KongZuo.KZInteractable
+  action: 3
+  displayName: "\u7B2C\u4E00\u6392\u4E03\u5EA7"
+  body: "\u6905\u80CC\u523B\u7740\uFF1A\u4E00\u6392\u4E03\u5EA7\u3002\n\n\u5176\u4ED6\u5EA7\u9762\u5E03\u6EE1\u7070\u5C18\uFF0C\u552F\u72EC\u8FD9\u91CC\u770B\u4E0A\u53BB\u5E72\u51C0\u4E00\u4E9B\u3002\n\u4E5F\u8BB8\u53EF\u4EE5\u53BB\u552E\u7968\u5904\u627E\u65E7\u8BB0\u5F55\u6838\u5BF9\u3002"
 --- !u!1 &900513895
 GameObject:
   m_ObjectHideFlags: 0
@@ -17998,7 +18018,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KongZuo.KZInteractable
   action: 8
   displayName: "\u6B8B\u7F3A\u7684\u65E7\u7968\u6839"
-  body: "\u7968\u6839\u4E0A\u6B8B\u7559\u7740\u5C40\u90E8\u5EA7\u6B21\u4E0E\u59D3\u540D\u3002\n\n\u793A\u4F8B\u7EBF\u7D22\uFF08\u5F85\u4E3B\u7B56\u5212\u786E\u8BA4\uFF09\uFF1A\u89C2\u4F17\u7532\u4E3A\u4E00\u6392\u516D\u5EA7\uFF0C\u89C2\u4F17\u4E59\u4E3A\u4E00\u6392\u516B\u5EA7\u3002\n\u4E03\u53F7\u4F4D\u6CA1\u6709\u552E\u7968\u8BB0\u5F55\u3002"
+  body: "\u7968\u6839\u53D7\u6F6E\u4E25\u91CD\uFF0C\u53EA\u80FD\u8FA8\u8BA4\u51FA1992\u5E747\u670817\u65E5\u548C\u201C\u4E03\u53F7\u5EA7\u672A\u552E\u201D\u51E0\u4E2A\u5B57\u3002\n\n\u5176\u4F59\u59D3\u540D\u4E0E\u5EA7\u4F4D\u4FE1\u606F\u5DF2\u7ECF\u6A21\u7CCA\u4E0D\u6E05\u3002"
 --- !u!23 &1034611093
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -18686,7 +18706,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KongZuo.KZInteractable
   action: 13
   displayName: "\u4E03\u53F7\u5EA7\u9057\u7269\u63A8\u7406\u8BB0\u5F55"
-  body: "\u628A\u65E7\u7167\u7247\u3001\u5EA7\u6B21\u548C\u573A\u52A1\u7269\u54C1\u8BB0\u5F55\u653E\u5728\u4E00\u8D77\u6838\u5BF9\u3002"
+  body: "\u628A\u65E7\u7167\u7247\u548C\u573A\u52A1\u7269\u54C1\u8BB0\u5F55\u653E\u5728\u4E00\u8D77\u6838\u5BF9\u3002"
 --- !u!23 &1052389794
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -39527,9 +39547,9 @@ MonoBehaviour:
   - {fileID: 1803863378}
   - {fileID: 81576796}
   - {fileID: 1075626046}
-  maxViewDistance: 2.4
-  maxViewportError: 0.075
-  requiredHoldSeconds: 0.8
+  maxViewDistance: 3.5
+  maxViewportError: 0.12
+  requiredHoldSeconds: 0.35
   occlusionMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -40219,5 +40239,5 @@ SceneRoots:
   - {fileID: 1075626046}
   - {fileID: 1978693594}
   - {fileID: 1052389797}
-  - {fileID: 444325867}
-  - {fileID: 536204123}
+  - {fileID: 899766361}
+  - {fileID: 181209425}

@@ -61,7 +61,6 @@ namespace KongZuo
                 if (!Has(KZFlags.Photo)) return "查看旧合照及背面文字";
                 if (!Has(KZFlags.Ticket)) return "前往售票口调查残缺票根";
                 if (!Has(KZFlags.PhotoAligned)) return "回到观众厅，按 F 对照旧照片与舞台立柱";
-                if (!Has(KZFlags.PuzzleSolved)) return "在售票口的座次图前复原部分座位";
                 if (!Has(KZFlags.WorkRecord)) return "阅读周明生的场务物品记录";
                 if (!Has(KZFlags.RelicIdentified)) return "结合照片和记录判断七号座留下的遗物";
                 if (!Has(KZFlags.EchoFinished)) return "返回第一排七座，调查钥匙曾放置的位置";
@@ -123,11 +122,6 @@ namespace KongZuo
         private bool ReadyForAnomaly()
         {
             return Has(KZFlags.Phone) && Has(KZFlags.Seat) && Has(KZFlags.Register);
-        }
-
-        private bool AllPuzzleClues()
-        {
-            return Has(KZFlags.Ritual) && Has(KZFlags.Photo) && Has(KZFlags.Ticket);
         }
 
         public void Handle(KZInteractable item)
@@ -194,33 +188,18 @@ namespace KongZuo
                     KZAudioFeedback.PlayCue(KZSoundCue.Paper);
                     KZHud.ShowPage(item.DisplayName, item.body, () => Mark(KZFlags.Ticket));
                     break;
-                case KZActionKind.SeatPuzzle:
-                    if (!Has(KZFlags.PhotoAligned))
-                    {
-                        KZHud.ShowToast("先用旧照片对准舞台立柱和侧梯，确认拍摄位置。");
-                        return;
-                    }
-                    if (Has(KZFlags.PuzzleSolved))
-                    {
-                        KZHud.ShowToast("座次已恢复：一排七座留给亡者。");
-                        return;
-                    }
-                    KZHud.ShowPuzzle(AllPuzzleClues, () =>
-                    {
-                        if (Has(KZFlags.PuzzleSolved)) return;
-                        Mark(KZFlags.PuzzleSolved);
-                        KZHud.ShowToast("座次与记录相符。再核对照片和场务记录，确认七号座留下的遗物。", 6f);
-                    });
+                case KZActionKind.SeatRecord:
+                    KZAudioFeedback.PlayCue(KZSoundCue.Paper);
+                    KZHud.ShowPage(item.DisplayName, item.body);
                     break;
                 case KZActionKind.WorkRecord:
                     KZAudioFeedback.PlayCue(KZSoundCue.Paper);
                     KZHud.ShowPage(item.DisplayName, item.body, () => Mark(KZFlags.WorkRecord));
                     break;
                 case KZActionKind.RelicDecision:
-                    if (!Has(KZFlags.PhotoAligned) || !Has(KZFlags.PuzzleSolved) ||
-                        !Has(KZFlags.WorkRecord))
+                    if (!Has(KZFlags.PhotoAligned) || !Has(KZFlags.WorkRecord))
                     {
-                        KZHud.ShowToast("旧照片、座次和场务记录还没有全部核对。");
+                        KZHud.ShowToast("旧照片和场务记录还没有全部核对。");
                         return;
                     }
                     if (Has(KZFlags.RelicIdentified))
@@ -305,14 +284,14 @@ namespace KongZuo
         {
             busy = true;
             if (player != null) player.SetFreezeWalking(true);
-            KZHud.ShowToast("《空座》\n第一章 · 座", 2.1f);
-            yield return new WaitForSeconds(1.7f);
             if (Application.CanStreamedLevelBeLoaded(KZSceneNames.ChapterOne))
             {
-                if (player != null)
-                    session.SetTransitionPose(player.transform.position, player.transform.rotation);
-                Mark(KZFlags.PrologueDone);
-                SceneManager.LoadScene(KZSceneNames.ChapterOne);
+                yield return KZTitleTransition.Play(KZSceneNames.ChapterOne, () =>
+                {
+                    if (player != null)
+                        session.SetTransitionPose(player.transform.position, player.transform.rotation);
+                    Mark(KZFlags.PrologueDone);
+                });
             }
             else
             {
