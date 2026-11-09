@@ -15,7 +15,6 @@ namespace KongZuo
         public const string Ritual = "RITUAL_READ";
         public const string Photo = "ZHOU_IDENTIFIED";
         public const string Ticket = "TICKETS_OBTAINED";
-        public const string PuzzleSolved = "SEATING_SOLVED";
         public const string EchoStarted = "ECHO01_STARTED";
         public const string EchoFinished = "ECHO01_FINISHED";
         public const string ChapterOneDone = "CHAPTER1_DONE";

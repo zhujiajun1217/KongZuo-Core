@@ -11,12 +11,23 @@ using KongZuo;
 public static class KZMergedArtSetup
 {
     private const string ArtRoot = "Assets/KongZuo/Art/KZ_OperaHouse_P0_V03";
-    private const string SourceScenePath = ArtRoot + "/Generated/Scenes/KZ_LatestModel_From11.unity";
-    private const string PrefabPath = ArtRoot + "/Generated/Prefabs/KZ_OperaHouse_P0_V03_From11_Final.prefab";
-    private const string SourceBuildingRootName = "KZ_OperaHouse_P0_V03_FULL";
+    private const string PrefabPath = ArtRoot + "/Generated/Prefabs/KZ_OperaHouse_P0_V03_FULL.prefab";
     private const string ArtInstanceName = "KZ_OperaHouse_P0_V03_From11_Integrated";
     private const string FirstFloorCollisionName = "99_PhysicalColliders_Floor01__do_not_disable";
-    private const string AdaptedMarker = "KZ_Scene_Adapted_From11_20261102";
+    private const string AdaptedMarker = "KZ_Scene_Adapted_Art02_20261106_FullPrefab";
+    private const string PreviousAdaptedMarker = "KZ_Scene_Adapted_From11_20261102";
+    private const string EarlierAdaptedMarker = "KZ_Scene_Adapted_Art02_20261106";
+    private const string PreviousBeamMarker = "KZ_Scene_Adapted_Art02_20261106_NoFirstFloorBeams";
+    private const string PreviousBeamMarkerV2 = "KZ_Scene_Adapted_Art02_20261106_NoFirstFloorBeamsV2";
+    private static readonly long[] InteriorAdjustedTransformIds =
+    {
+        1655034640484464130L,
+        2617335912776364710L,
+        4088696844770859463L,
+        8103686996711970863L,
+        8791354829395931536L
+    };
+    private static readonly float[] InteriorAdjustedLocalY = { 10f, 9f, 9f, 10f, 10f };
     private static readonly string[] LegacyArtInstanceNames =
     {
         "KZ_OperaHouse_P2_Integrated_Visuals",
@@ -28,6 +39,8 @@ public static class KZMergedArtSetup
     [MenuItem("Tools/空座/整合/将戏楼美术接入序章和第一章")]
     public static void Integrate()
     {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+            throw new InvalidOperationException("Exit Play mode before integrating the updated Art02 FULL prefab.");
         if (!Application.isBatchMode && HasUnsavedLoadedScenes() &&
             !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
         AssetDatabase.Refresh();
@@ -38,52 +51,14 @@ public static class KZMergedArtSetup
         IntegrateScene("Assets/KongZuo/Scenes/01_Prologue.unity", prefab);
         IntegrateScene("Assets/KongZuo/Scenes/02_Chapter01.unity", prefab);
         AssetDatabase.SaveAssets();
-        Debug.Log("KZ_ART_INTEGRATION_OK: playable prologue and chapter 1 use the latest two-storey art.");
+        Debug.Log("KZ_ART_INTEGRATION_OK: playable prologue and chapter 1 use the latest Art02 FULL prefab.");
     }
 
     private static GameObject BuildLatestPrefab()
     {
-        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(SourceScenePath) == null)
-            throw new FileNotFoundException("Latest art source scene is missing: " + SourceScenePath);
-        Scene previous = SceneManager.GetActiveScene();
-        Scene source = EditorSceneManager.OpenScene(SourceScenePath, OpenSceneMode.Additive);
-        try
-        {
-            GameObject building = FindRoot(source, SourceBuildingRootName);
-            if (building == null)
-                throw new InvalidOperationException("Latest art source has no opera-house root.");
-
-            GameObject composition = new GameObject("KZ_OperaHouse_P0_V03_From11");
-            SceneManager.MoveGameObjectToScene(composition, source);
-            int includedRoots = 0;
-            foreach (GameObject root in source.GetRootGameObjects())
-            {
-                if (root == composition || IsPreviewOnlyRoot(root)) continue;
-                root.transform.SetParent(composition.transform, true);
-                includedRoots++;
-            }
-            if (includedRoots < 1)
-                throw new InvalidOperationException("Latest art source did not contain the expected model roots.");
-
-            GameObject saved = PrefabUtility.SaveAsPrefabAsset(composition, PrefabPath);
-            if (saved == null) throw new InvalidOperationException("Could not save latest art prefab.");
-            Debug.Log("[空座] 已从最终模型场景组合戏楼资源根对象：" + includedRoots);
-            return saved;
-        }
-        finally
-        {
-            if (previous.IsValid() && previous.isLoaded)
-                SceneManager.SetActiveScene(previous);
-            EditorSceneManager.CloseScene(source, true);
-        }
-    }
-
-    private static bool IsPreviewOnlyRoot(GameObject root)
-    {
-        return root.name == "Player" ||
-            root.name == "Main Camera" ||
-            root.name.StartsWith("_PREVIEW_", StringComparison.Ordinal) ||
-            root.GetComponentInChildren<Camera>(true) != null;
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath) == null)
+            throw new FileNotFoundException("Latest art prefab is missing: " + PrefabPath);
+        return AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
     }
 
     private static bool HasUnsavedLoadedScenes()
@@ -120,24 +95,26 @@ public static class KZMergedArtSetup
             }
             GameObject art = FindRoot(scene, ArtInstanceName);
             if (art == null) throw new InvalidOperationException(path + ": latest art is missing.");
+            KZStoryDirector director = FindDirector(scene);
+            if (director == null) throw new InvalidOperationException(path + ": story director is missing.");
             if (PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(art) != PrefabPath)
                 throw new InvalidOperationException(path + ": final From11 art prefab is not in use.");
             if (FindChildRecursive(art.transform, "08_AudienceSeats_9x13__no_centre_aisle") == null)
                 throw new InvalidOperationException(path + ": final audience seating layout is missing.");
+            ValidateInteriorModelLayout(art);
             Transform firstFloor = FindChildRecursive(art.transform, FirstFloorCollisionName);
-            Transform secondFloor = FindChildRecursive(art.transform, "第二层");
-            Transform stair = FindChildRecursive(art.transform, "04_一楼右通道_中式回折楼梯");
+            Transform stage = FindChildRecursive(art.transform, "04_Stage");
+            Transform stair = FindChildRecursive(art.transform, "H_StageStair_Right");
             if (firstFloor == null || !firstFloor.gameObject.activeInHierarchy ||
-                secondFloor == null || !secondFloor.gameObject.activeInHierarchy ||
+                stage == null || !stage.gameObject.activeInHierarchy ||
                 stair == null || !stair.gameObject.activeInHierarchy)
-                throw new InvalidOperationException(path + ": a floor or stair is missing/disabled.");
+                throw new InvalidOperationException(path + ": the stage or latest stair model is missing/disabled.");
             if (players != 1 || directors != 1 || huds != 1 || cameras != 1 || listeners != 1)
                 throw new InvalidOperationException(path + ": duplicate/missing player, director, HUD or camera.");
             if (missingScripts != 0)
                 throw new InvalidOperationException(path + ": Missing Script count=" + missingScripts);
             if (FindRoot(scene, "KZ_OperaHouse_P2_Integrated_Visuals") != null)
                 throw new InvalidOperationException(path + ": old P2 building remains active.");
-            KZStoryDirector director = FindDirector(scene);
             GameObject audience = FindRoot(scene, "观众厅出入检测");
             if (director != null && director.isPrologue &&
                 (audience == null || audience.GetComponent<BoxCollider>() == null ||
@@ -150,7 +127,7 @@ public static class KZMergedArtSetup
                  FindRoot(scene, "周明生场务物品记录") == null ||
                  FindRoot(scene, "七号座遗物推理记录") == null))
                 throw new InvalidOperationException(path + ": chapter-one clue/photo calibration is incomplete.");
-            Debug.Log("[空座检查] " + path + ": single player/HUD/director/camera; both floors and stairs present; no Missing Scripts.");
+            Debug.Log("[空座检查] " + path + ": latest art prefab, stage, stair and first-floor collision present; no Missing Scripts.");
         }
     }
 
@@ -158,15 +135,27 @@ public static class KZMergedArtSetup
     [InitializeOnLoad]
     private static class FirstOpenIntegration
     {
-        private const string SessionKey = "KZ_Art_Integration_Attempted_This_Session";
+        private const string SessionKey = "KZ_Art_Integration_FullPrefab_Attempted_This_Session";
 
         static FirstOpenIntegration()
         {
             EditorApplication.delayCall += TryIntegrate;
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        }
+
+        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.EnteredEditMode)
+                EditorApplication.delayCall += TryIntegrate;
         }
 
         private static void TryIntegrate()
         {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                Debug.LogWarning("[空座] 当前正在播放，退出 Play 模式后运行 Tools/空座/整合 菜单以应用一楼横梁调整。");
+                return;
+            }
             if (EditorApplication.isCompiling || EditorApplication.isUpdating)
             {
                 EditorApplication.delayCall += TryIntegrate;
@@ -205,7 +194,6 @@ public static class KZMergedArtSetup
         KZStoryDirector director = FindDirector(scene);
         if (director == null)
             throw new InvalidOperationException(path + ": playable scene is missing its story director.");
-        bool hasArt = false;
         GameObject art = null;
         int hiddenObjects = 0;
         int removedLegacyArt = 0;
@@ -216,8 +204,7 @@ public static class KZMergedArtSetup
                 string currentPrefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(root);
                 if (currentPrefabPath == PrefabPath)
                 {
-                    hasArt = true;
-                    art = root;
+                    UnityEngine.Object.DestroyImmediate(root);
                 }
                 else
                 {
@@ -234,15 +221,13 @@ public static class KZMergedArtSetup
             }
         }
 
-        if (!hasArt)
-        {
-            art = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
-            if (art == null) throw new InvalidOperationException("Could not instantiate art prefab in " + path);
-            art.name = ArtInstanceName;
-            art.transform.position = Vector3.zero;
-            art.transform.rotation = Quaternion.identity;
-            art.transform.localScale = Vector3.one;
-        }
+        art = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
+        if (art == null) throw new InvalidOperationException("Could not instantiate art prefab in " + path);
+        art.name = ArtInstanceName;
+        art.transform.position = Vector3.zero;
+        art.transform.rotation = Quaternion.identity;
+        art.transform.localScale = Vector3.one;
+        ApplyInteriorModelLayout(art);
         if (art == null) throw new InvalidOperationException("Integrated art instance was not found in " + path);
         Transform firstFloorCollision = FindChildRecursive(art.transform, FirstFloorCollisionName);
         if (firstFloorCollision == null)
@@ -295,9 +280,17 @@ public static class KZMergedArtSetup
                 "\n\n那天留座戏结束后，钥匙没有按惯例交回。",
                 register.position + new Vector3(-.55f, .08f, .5f));
             EnsureEvidence(scene, "七号座遗物推理记录", KZActionKind.RelicDecision,
-                "把旧照片、座次和场务物品记录放在一起核对。",
+                "把旧照片和场务物品记录放在一起核对。",
                 register.position + new Vector3(.55f, .08f, .5f));
         }
+        GameObject previousMarker = FindRoot(scene, PreviousAdaptedMarker);
+        if (previousMarker != null) UnityEngine.Object.DestroyImmediate(previousMarker);
+        GameObject earlierMarker = FindRoot(scene, EarlierAdaptedMarker);
+        if (earlierMarker != null) UnityEngine.Object.DestroyImmediate(earlierMarker);
+        GameObject previousBeamMarker = FindRoot(scene, PreviousBeamMarker);
+        if (previousBeamMarker != null) UnityEngine.Object.DestroyImmediate(previousBeamMarker);
+        GameObject previousBeamMarkerV2 = FindRoot(scene, PreviousBeamMarkerV2);
+        if (previousBeamMarkerV2 != null) UnityEngine.Object.DestroyImmediate(previousBeamMarkerV2);
         if (FindRoot(scene, AdaptedMarker) == null)
             new GameObject(AdaptedMarker);
 
@@ -305,6 +298,63 @@ public static class KZMergedArtSetup
         if (!EditorSceneManager.SaveScene(scene)) throw new InvalidOperationException("Could not save " + path);
         Debug.Log("KZ_ART_SCENE_OK: " + path + "; hidden greybox renderers=" + hiddenObjects +
             "; removed legacy art=" + removedLegacyArt);
+    }
+
+    private static void ApplyInteriorModelLayout(GameObject art)
+    {
+        string prefabGuid = AssetDatabase.AssetPathToGUID(PrefabPath);
+        bool[] applied = new bool[InteriorAdjustedTransformIds.Length];
+        foreach (Transform instanceTransform in art.GetComponentsInChildren<Transform>(true))
+        {
+            UnityEngine.Object source = PrefabUtility.GetCorrespondingObjectFromSource(instanceTransform);
+            if (source == null ||
+                !AssetDatabase.TryGetGUIDAndLocalFileIdentifier(source, out string sourceGuid, out long sourceId) ||
+                sourceGuid != prefabGuid)
+                continue;
+
+            for (int i = 0; i < InteriorAdjustedTransformIds.Length; i++)
+            {
+                if (applied[i] || sourceId != InteriorAdjustedTransformIds[i]) continue;
+                Vector3 localPosition = instanceTransform.localPosition;
+                localPosition.y = InteriorAdjustedLocalY[i];
+                instanceTransform.localPosition = localPosition;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(instanceTransform);
+                applied[i] = true;
+            }
+        }
+
+        for (int i = 0; i < applied.Length; i++)
+            if (!applied[i])
+                throw new InvalidOperationException("Could not apply Interior layout to art transform " +
+                    InteriorAdjustedTransformIds[i] + ".");
+    }
+
+    private static void ValidateInteriorModelLayout(GameObject art)
+    {
+        string prefabGuid = AssetDatabase.AssetPathToGUID(PrefabPath);
+        bool[] validated = new bool[InteriorAdjustedTransformIds.Length];
+        foreach (Transform instanceTransform in art.GetComponentsInChildren<Transform>(true))
+        {
+            UnityEngine.Object source = PrefabUtility.GetCorrespondingObjectFromSource(instanceTransform);
+            if (source == null ||
+                !AssetDatabase.TryGetGUIDAndLocalFileIdentifier(source, out string sourceGuid, out long sourceId) ||
+                sourceGuid != prefabGuid)
+                continue;
+
+            for (int i = 0; i < InteriorAdjustedTransformIds.Length; i++)
+            {
+                if (validated[i] || sourceId != InteriorAdjustedTransformIds[i]) continue;
+                if (Mathf.Abs(instanceTransform.localPosition.y - InteriorAdjustedLocalY[i]) > 0.001f)
+                    throw new InvalidOperationException("Prologue art does not match the Interior layout at transform " +
+                        InteriorAdjustedTransformIds[i] + ".");
+                validated[i] = true;
+            }
+        }
+
+        for (int i = 0; i < validated.Length; i++)
+            if (!validated[i])
+                throw new InvalidOperationException("Could not validate Interior layout at art transform " +
+                    InteriorAdjustedTransformIds[i] + ".");
     }
 
     private static bool ContainsLegacyArtName(string text)

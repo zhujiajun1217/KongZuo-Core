@@ -16,20 +16,14 @@ namespace KongZuo
         private string pageBody;
         private Action pageClosed;
         private bool journalOpen;
-        private bool puzzleOpen;
         private bool relicOpen;
         private int relicChoice;
         private Action relicSolved;
         private string relicFeedback = "";
         private int relicOpenedFrame = -1;
-        private KZSeatPuzzle puzzle = new KZSeatPuzzle();
-        private Func<bool> cluesKnown;
-        private Action puzzleSolved;
-        private string puzzleFeedback = "";
         private Vector2 scroll;
         private float toastUntil;
         private int pageOpenedFrame = -1;
-        private int puzzleOpenedFrame = -1;
 
         private GUIStyle labelStyle;
         private GUIStyle headStyle;
@@ -43,9 +37,8 @@ namespace KongZuo
 
         public static bool IsModal
         {
-            get { return current != null &&
-                (current.pageTitle != null || current.journalOpen || current.puzzleOpen ||
-                 current.relicOpen); }
+            get { return KZTitleTransition.IsPlaying || (current != null &&
+                (current.pageTitle != null || current.journalOpen || current.relicOpen)); }
         }
 
         private void Awake() { current = this; }
@@ -76,7 +69,6 @@ namespace KongZuo
                 return;
             }
             current.journalOpen = false;
-            current.puzzleOpen = false;
             current.relicOpen = false;
             current.pageTitle = title ?? "资料检视";
             current.pageBody = body ?? "";
@@ -85,27 +77,11 @@ namespace KongZuo
             current.pageOpenedFrame = Time.frameCount;
         }
 
-        public static void ShowPuzzle(Func<bool> isReady, Action onSolved)
-        {
-            if (current == null) { Debug.LogWarning("缺少 KZHud。"); return; }
-            current.journalOpen = false;
-            current.pageTitle = null;
-            current.pageBody = null;
-            current.pageClosed = null;
-            current.puzzleOpen = true;
-            current.relicOpen = false;
-            current.puzzleOpenedFrame = Time.frameCount;
-            current.cluesKnown = isReady;
-            current.puzzleSolved = onSolved;
-            current.puzzleFeedback = "根据宣传册、合照与票根填写座次。";
-        }
-
         public static void ShowRelicChoice(Action onSolved)
         {
             if (current == null) { Debug.LogWarning("缺少 KZHud。"); return; }
             current.pageTitle = null;
             current.journalOpen = false;
-            current.puzzleOpen = false;
             current.relicOpen = true;
             current.relicChoice = 0;
             current.relicSolved = onSolved;
@@ -124,52 +100,12 @@ namespace KongZuo
 
         private void Update()
         {
+            if (KZTitleTransition.IsPlaying) return;
             if (pageTitle != null)
             {
                 if (Time.frameCount != pageOpenedFrame &&
                     (KZInput.ConsumeInteract() || KZInput.ConsumeEscape()))
                     ClosePage();
-                return;
-            }
-
-            if (puzzleOpen)
-            {
-                if (Time.frameCount == puzzleOpenedFrame) return;
-                if (KZInput.ConsumeInteract() || KZInput.ConsumeEscape())
-                {
-                    puzzleOpen = false;
-                    return;
-                }
-                if (KZInput.Number(1))
-                    puzzleFeedback = "一排七座必须留空，不能安排观众。";
-                if (KZInput.Number(0)) puzzle.Cycle(0);
-                if (KZInput.Number(2)) puzzle.Cycle(2);
-                if (KZInput.Confirm())
-                {
-                    KZSeatPuzzle.Result result = puzzle.Check(cluesKnown != null && cluesKnown());
-                    switch (result)
-                    {
-                        case KZSeatPuzzle.Result.MissingClues:
-                            puzzleFeedback = "还缺少关键证据：请查看宣传册、旧合照、票根。";
-                            KZAudioFeedback.PlayCue(KZSoundCue.PuzzleFailure);
-                            break;
-                        case KZSeatPuzzle.Result.Incomplete:
-                            puzzleFeedback = "还有位置未填写；按数字1和3切换人物。";
-                            KZAudioFeedback.PlayCue(KZSoundCue.PuzzleFailure);
-                            break;
-                        case KZSeatPuzzle.Result.Incorrect:
-                            puzzleFeedback = "座次与已有线索不符，可以继续修改。";
-                            KZAudioFeedback.PlayCue(KZSoundCue.PuzzleFailure);
-                            break;
-                        case KZSeatPuzzle.Result.Correct:
-                            KZAudioFeedback.PlayCue(KZSoundCue.PuzzleSuccess);
-                            puzzleOpen = false;
-                            Action callback = puzzleSolved;
-                            puzzleSolved = null;
-                            if (callback != null) callback();
-                            break;
-                    }
-                }
                 return;
             }
 
@@ -260,7 +196,7 @@ namespace KongZuo
 
         private void OnGUI()
         {
-            if (current != this) return;
+            if (current != this || KZTitleTransition.IsPlaying) return;
             PrepareStyles();
 
             float topWidth = Mathf.Min(650f, Screen.width - 28f);
@@ -283,27 +219,6 @@ namespace KongZuo
                 GUILayout.EndScrollView();
                 GUILayout.FlexibleSpace();
                 GUILayout.Label("按 E / Esc 收起文档 · 继续调查", footerStyle);
-                GUILayout.EndArea();
-            }
-            else if (puzzleOpen)
-            {
-                float w = Mathf.Min(760f, Screen.width - 40f);
-                float h = Mathf.Max(160f, Mathf.Min(440f, Screen.height - 140f));
-                Rect area = new Rect((Screen.width - w) * .5f, (Screen.height - h) * .5f, w, h);
-                Panel(area);
-                GUILayout.BeginArea(new Rect(area.x + 24f, area.y + 18f, area.width - 48f, area.height - 36f));
-                GUILayout.Label("座次复原（旧版 P0 测试谜题）", headStyle);
-                GUILayout.Space(12f);
-                GUILayout.Label("一排六座 [按1切换]：" + puzzle.Seat6, labelStyle);
-                GUILayout.Label("一排七座 [按2尝试]：" + puzzle.Seat7, labelStyle);
-                GUILayout.Label("一排八座 [按3切换]：" + puzzle.Seat8, labelStyle);
-                GUILayout.Space(12f);
-                GUILayout.Label("请依据已读票根安排观众甲与观众乙。" +
-                    "\n一排七座必须留空，且同一观众不能出现在两张椅子上。", labelStyle);
-                GUILayout.Space(12f);
-                GUILayout.Label(puzzleFeedback, labelStyle);
-                GUILayout.FlexibleSpace();
-                GUILayout.Label("Enter 提交判定 · E / Esc 返回现场", footerStyle);
                 GUILayout.EndArea();
             }
             else if (relicOpen)
@@ -375,9 +290,8 @@ namespace KongZuo
             if (s.HasFlag(KZFlags.Program)) result += "• 节目单：1992年7月17日，周明生留座戏。\n\n";
             if (s.HasFlag(KZFlags.Ritual)) result += "• 留座戏：亡者留座，戏散前不得取遗物。\n\n";
             if (s.HasFlag(KZFlags.Photo)) result += "• 旧合照背面：周明生，1972—1992。\n\n";
-            if (s.HasFlag(KZFlags.Ticket)) result += "• 票根：可与座次表核对。\n\n";
+            if (s.HasFlag(KZFlags.Ticket)) result += "• 票根：残缺记录显示七号座未售。\n\n";
             if (s.HasFlag(KZFlags.PhotoAligned)) result += "• 照片对位：立柱与侧梯吻合，中央留出了七号座。\n\n";
-            if (s.HasFlag(KZFlags.PuzzleSolved)) result += "• 座次图：一排七座必须留空。\n\n";
             if (s.HasFlag(KZFlags.WorkRecord)) result += "• 场务物品记录：周明生保管过戏楼钥匙。\n\n";
             if (s.HasFlag(KZFlags.RelicIdentified)) result += "• 遗物推理：七号座留下的是钥匙串。\n\n";
             if (s.HasFlag(KZFlags.EchoFinished)) result += "• 残响：女子在空座坐下，拿走钥匙。\n\n";

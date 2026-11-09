@@ -76,7 +76,7 @@ namespace KongZuo.EditorTools
             EditorUtility.DisplayDialog("空座：P0灰盒创建成功",
                 "已生成00_Bootstrap、01_Prologue、02_Chapter01。\n" +
                 "现在点击Play，即可从工作单开始测试序章与第一章。\n" +
-                "WASD移动，E调查，Tab笔记，数字1/3调整座次，Enter判定。", "开始测试");
+                "WASD移动，E调查，F照片对位，Tab笔记。", "开始测试");
         }
 
         [MenuItem("空座/02 检查版本与场景")]
@@ -444,12 +444,11 @@ namespace KongZuo.EditorTools
 
             Stand(new Vector3(6.4f, 0f, -11.2f));
             Prop("残缺的旧票根", KZActionKind.Ticket,
-                "票根上残留着局部座次与姓名。\n\n" +
-                "示例线索（待主策划确认）：观众甲为一排六座，" +
-                "观众乙为一排八座。\n七号位没有售票记录。",
+                "票根受潮严重，只能辨认出1992年7月17日和“七号座未售”几个字。\n\n" +
+                "其余姓名与座位信息已经模糊不清。",
                 new Vector3(6.2f, 1.0f, -11.2f), new Vector3(.68f, .07f, .44f), redMat);
-            Prop("一排座次示意图", KZActionKind.SeatPuzzle,
-                "选择人物卡，恢复第一排部分座次。",
+            Prop("一排座次示意图", KZActionKind.SeatRecord,
+                "示意图上第一排中央的七号位置没有标记。纸边旧注：留座戏期间，中央座位不可坐人。",
                 new Vector3(7.5f, 1.22f, -11.2f), new Vector3(.80f, .12f, .62f), paperMat);
 
             CreateEchoActors(director);

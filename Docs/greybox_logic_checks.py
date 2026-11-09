@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Unity不可在这个运行环境内启动。此脚本对源码结构做静态校验，
-# 并用Python等价模型穷举座次输入、异常触发边界，不冒充Unity编译测试。
+# 并检查剧情门槛与异常触发边界，不冒充Unity编译测试。
 from pathlib import Path
 from itertools import product
 import re
@@ -64,6 +64,8 @@ for n,src in CS.items():
 action_enum_body=re.search(
     r"public enum KZActionKind\s*\{([^}]*)\}",CS["KZInteractable"]).group(1)
 action_enum=set(re.findall(r"\b[A-Za-z_]\w*\b",action_enum_body))
+action_values=[item.strip() for item in action_enum_body.split(",") if item.strip()]
+assert action_values.index("SeatRecord") == 9 # Existing scene YAML serializes this action as 9.
 for n,src in CS.items():
     for found in re.findall(r"\bKZActionKind\.(\w+)",src):
         assert found in action_enum,(n,"unknown action",found)
@@ -78,44 +80,26 @@ assert "TryAddFlag(KZFlags.EchoStarted)" in CS["KZStoryDirector"]
 assert "player.SetFreezeWalking(false)" in CS["KZStoryDirector"]
 assert "OnDisable()" in CS["KZStoryDirector"]
 assert "OnTriggerExit" in CS["KZStoryTrigger"]
+assert "KZ_OperaHouse_P0_V03_FULL.prefab" in CS["KZMergedArtSetup"]
+assert "PrefabUtility.InstantiatePrefab(prefab, scene)" in CS["KZMergedArtSetup"]
+assert "RemovedArtObjects" not in CS["KZMergedArtSetup"]
+art_guid = (ROOT/"Assets/KongZuo/Art/KZ_OperaHouse_P0_V03/Generated/Prefabs/"
+            "KZ_OperaHouse_P0_V03_FULL.prefab.meta").read_text(encoding="utf-8")
+art_guid = re.search(r"^guid: (\w+)$", art_guid, re.M).group(1)
+for scene_name in ("01_Prologue.unity", "02_Chapter01.unity"):
+    scene = (ROOT/"Assets/KongZuo/Scenes"/scene_name).read_text(encoding="utf-8")
+    assert f"guid: {art_guid}, type: 3" in scene, (scene_name, "latest FULL prefab is not referenced")
+    assert f"m_RemovedGameObjects:\n    - {{fileID: " not in scene, (
+        scene_name, "FULL prefab instance still removes source objects")
 
-# 与KZSeatPuzzle.Cycle/Check逐行等价的可执行输入模型。
-class SeatPuzzle:
-    def __init__(self): self.seat6,self.seat8=0,0
-    def cycle(self,index):
-        if index not in (0,2): return False
-        current,other=(self.seat6,self.seat8) if index==0 else (self.seat8,self.seat6)
-        for step in range(1,4):
-            nxt=(current+step)%3
-            if nxt!=0 and nxt==other: continue
-            if index==0: self.seat6=nxt
-            else: self.seat8=nxt
-            return True
-        return False
-    def check(self,clues):
-        if not clues: return "MissingClues"
-        if self.seat6==0 or self.seat8==0: return "Incomplete"
-        return "Correct" if (self.seat6,self.seat8)==(1,2) else "Incorrect"
-
-p=SeatPuzzle()
-assert p.check(True)=="Incomplete"
-assert p.cycle(1)==False and (p.seat6,p.seat8)==(0,0) # 7号必须留空
-assert p.cycle(-1)==False and p.cycle(3)==False
-assert p.cycle(0) and p.cycle(2)
-assert (p.seat6,p.seat8)==(1,2) and p.check(False)=="MissingClues"
-assert p.check(True)=="Correct"
-wrong=SeatPuzzle(); wrong.cycle(2); wrong.cycle(0)
-assert (wrong.seat6,wrong.seat8)==(2,1) and wrong.check(True)=="Incorrect"
-
-cases=0
-for length in range(7):
-    for sequence in product((0,1,2),repeat=length):
-        test=SeatPuzzle()
-        for key in sequence: test.cycle(key)
-        assert test.seat6 in (0,1,2) and test.seat8 in (0,1,2)
-        assert test.seat6==0 or test.seat8==0 or test.seat6!=test.seat8
-        assert test.check(False)=="MissingClues"
-        cases+=1
+assert "KZSeatPuzzle" not in CS
+assert "ShowPuzzle" not in CS["KZHud"]
+assert "PuzzleSolved" not in CS["KZFlags"] + CS["KZStoryDirector"] + CS["KZHud"]
+assert "case KZActionKind.SeatRecord:" in CS["KZStoryDirector"]
+assert "KZHud.ShowPage(item.DisplayName, item.body);" in CS["KZStoryDirector"]
+assert "KZFlags.PhotoAligned" in CS["KZStoryDirector"]
+assert "KZFlags.WorkRecord" in CS["KZStoryDirector"]
+assert "KZFlags.PuzzleSolved" not in CS["KZStoryDirector"]
 
 # 重返观众厅：任意顺序的电话、座位、登记表不应影响条件。
 gate_cases=0
@@ -137,7 +121,7 @@ assert all(heights[i+1]-heights[i]<=0.30 for i in range(len(heights)-1))
 assert "5000" not in CS["KZMainProjectSetup"] # 防止生成过量复杂对象的占位误配置
 
 print(f"PASS: {len(CS)} C# files structurally checked")
-print(f"PASS: {cases} puzzle key sequences (including boundary/duplicate/locked seat)")
+print("PASS: ticket-based seat restoration puzzle removed")
 print(f"PASS: {gate_cases} story prerequisite combinations")
 print("PASS: scene references, interruption cleanup, and greybox geometry assumptions")
 print("NOTE: requires Unity 6000.3.26f1 Play + Windows build for real engine validation")
