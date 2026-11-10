@@ -22,8 +22,13 @@ namespace KongZuo
         private Vector3 horizontalVelocity;
         private Vector2 smoothLook;
         private Vector2 lookVelocity;
+        private Vector3 standingEyeLocalPosition;
 
-        public void SetCameraPivot(Transform pivot) { eye = pivot; }
+        public void SetCameraPivot(Transform pivot)
+        {
+            eye = pivot;
+            if (eye != null) standingEyeLocalPosition = eye.localPosition;
+        }
         public void SetFreezeWalking(bool frozen)
         {
             freezeWalking = frozen;
@@ -42,7 +47,11 @@ namespace KongZuo
             horizontalVelocity = Vector3.zero;
             smoothLook = Vector2.zero;
             lookVelocity = Vector2.zero;
-            if (eye != null) eye.localRotation = Quaternion.identity;
+            if (eye != null)
+            {
+                eye.localPosition = standingEyeLocalPosition;
+                eye.localRotation = Quaternion.identity;
+            }
         }
 
         public void TeleportView(Vector3 cameraPosition, Quaternion cameraRotation)
@@ -56,7 +65,9 @@ namespace KongZuo
             float yaw = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
             float viewPitch = -Mathf.Asin(Mathf.Clamp(forward.y, -1f, 1f)) * Mathf.Rad2Deg;
             Quaternion bodyRotation = Quaternion.Euler(0f, yaw, 0f);
-            Vector3 rootPosition = cameraPosition - bodyRotation * eye.localPosition;
+            // Cinematic animation changes eye.localPosition; use the authored eye offset.
+            Vector3 rootPosition = cameraPosition - bodyRotation *
+                Vector3.Scale(transform.lossyScale, standingEyeLocalPosition);
             Teleport(rootPosition, bodyRotation);
             pitch = Mathf.Clamp(viewPitch, -82f, 82f);
             eye.localRotation = Quaternion.Euler(pitch, 0f, 0f);
@@ -70,6 +81,7 @@ namespace KongZuo
                 Camera cameraChild = GetComponentInChildren<Camera>();
                 if (cameraChild != null) eye = cameraChild.transform;
             }
+            if (eye != null) standingEyeLocalPosition = eye.localPosition;
         }
 
         private void Start()
