@@ -14,6 +14,7 @@ namespace KongZuo
                 Debug.LogError("[空座] 缺少序章场景；请先执行 空座/生成P0灰盒场景。");
                 return;
             }
+            KZBackgroundMusic.EnsurePlaying();
             SceneManager.LoadScene(KZSceneNames.Prologue);
         }
     }

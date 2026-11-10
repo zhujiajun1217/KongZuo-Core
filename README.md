@@ -16,7 +16,7 @@
 - `Assets/KongZuo/Scenes/`：Bootstrap、序章和第一章。
 - `Assets/KongZuo/Scripts/`：主线运行时代码。
 - `Assets/KongZuo/Art/`：主线场景及戏楼模型使用的资源。
-- `Assets/KongZuo/Audio/`：主线占位音效。
+- `Assets/KongZuo/Audio/`：主线占位音效和循环背景音乐。
 - `Assets/KongZuo/Editor/`：场景检查和编辑器辅助工具。
 - `Packages/`、`ProjectSettings/`：Unity 包与项目设置。
 - `Docs/`：项目状态、模型接入说明和主线 QA。
