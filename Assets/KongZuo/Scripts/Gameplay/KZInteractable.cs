@@ -5,7 +5,7 @@ namespace KongZuo
     public enum KZActionKind
     {
         Worksheet, FrontDoor, Phone, Seat07, Register, Program,
-        Ritual, OldPhoto, Ticket, SeatPuzzle, BackstageDoor, Poster,
+        Ritual, OldPhoto, Ticket, SeatRecord, BackstageDoor, Poster,
         WorkRecord, RelicDecision
     }
 
