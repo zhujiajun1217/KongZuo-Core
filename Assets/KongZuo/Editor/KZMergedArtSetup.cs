@@ -22,12 +22,11 @@ public static class KZMergedArtSetup
     private static readonly long[] InteriorAdjustedTransformIds =
     {
         1655034640484464130L,
-        2617335912776364710L,
-        4088696844770859463L,
         8103686996711970863L,
         8791354829395931536L
     };
-    private static readonly float[] InteriorAdjustedLocalY = { 10f, 9f, 9f, 10f, 10f };
+    // These three transforms still exist in FULL; the two retired beam IDs were removed.
+    private static readonly float[] InteriorAdjustedLocalY = { 10f, 10f, 10f };
     private static readonly string[] LegacyArtInstanceNames =
     {
         "KZ_OperaHouse_P2_Integrated_Visuals",
@@ -48,10 +47,11 @@ public static class KZMergedArtSetup
         if (prefab == null)
             throw new InvalidOperationException("Latest art prefab was not generated: " + PrefabPath);
 
+        KZArt01TaskSetup.GenerateAssets();
         IntegrateScene("Assets/KongZuo/Scenes/01_Prologue.unity", prefab);
         IntegrateScene("Assets/KongZuo/Scenes/02_Chapter01.unity", prefab);
         AssetDatabase.SaveAssets();
-        Debug.Log("KZ_ART_INTEGRATION_OK: playable prologue and chapter 1 use the latest Art02 FULL prefab.");
+        Debug.Log("KZ_ART_INTEGRATION_OK: playable prologue and chapter 1 use the latest theatre and Art01 dressing-room props; available when playing 00_Bootstrap.");
     }
 
     private static GameObject BuildLatestPrefab()
@@ -102,6 +102,7 @@ public static class KZMergedArtSetup
             if (FindChildRecursive(art.transform, "08_AudienceSeats_9x13__no_centre_aisle") == null)
                 throw new InvalidOperationException(path + ": final audience seating layout is missing.");
             ValidateInteriorModelLayout(art);
+            KZArt01TaskSetup.ValidateScene(scene);
             Transform firstFloor = FindChildRecursive(art.transform, FirstFloorCollisionName);
             Transform stage = FindChildRecursive(art.transform, "04_Stage");
             Transform stair = FindChildRecursive(art.transform, "H_StageStair_Right");
@@ -294,6 +295,8 @@ public static class KZMergedArtSetup
         if (FindRoot(scene, AdaptedMarker) == null)
             new GameObject(AdaptedMarker);
 
+        // Always rebuild the dressing-room pass with the same menu as the building.
+        KZArt01TaskSetup.ApplyToScene(scene);
         EditorSceneManager.MarkSceneDirty(scene);
         if (!EditorSceneManager.SaveScene(scene)) throw new InvalidOperationException("Could not save " + path);
         Debug.Log("KZ_ART_SCENE_OK: " + path + "; hidden greybox renderers=" + hiddenObjects +
