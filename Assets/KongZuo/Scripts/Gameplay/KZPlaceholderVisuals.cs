@@ -32,6 +32,9 @@ namespace KongZuo
 
         private static void PolishRecursive(Transform item)
         {
+            // Authored external models replace these fallback visuals, including their descendants.
+            if (item.name == "KZ_ExternalProps_Mainline" || item.name == "KZ_ExternalSeating_9x13" ||
+                item.name == "ExternalModel" || item.Find("ExternalModel") != null) return;
             string name = item.name;
             if (item.Find(VisualRootName) == null)
             {

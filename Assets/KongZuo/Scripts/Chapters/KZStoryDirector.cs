@@ -61,7 +61,7 @@ namespace KongZuo
                 if (!Has(KZFlags.Photo)) return "查看旧合照及背面文字";
                 if (!Has(KZFlags.Ticket)) return "前往售票口调查残缺票根";
                 if (!Has(KZFlags.PhotoAligned)) return "回到观众厅，按 F 对照旧照片与舞台立柱";
-                if (!Has(KZFlags.WorkRecord)) return "阅读周明生的场务物品记录";
+                if (!Has(KZFlags.WorkRecord)) return "到售票资料台前沿，阅读周明生的场务物品记录";
                 if (!Has(KZFlags.RelicIdentified)) return "结合照片和记录判断七号座留下的遗物";
                 if (!Has(KZFlags.EchoFinished)) return "返回第一排七座，调查钥匙曾放置的位置";
                 return "第一章完成：调查笔记已记录残响";
