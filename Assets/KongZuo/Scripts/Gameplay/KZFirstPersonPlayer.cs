@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 namespace KongZuo
@@ -23,36 +24,117 @@ namespace KongZuo
         private Vector2 smoothLook;
         private Vector2 lookVelocity;
 
-        public void SetCameraPivot(Transform pivot) { eye = pivot; }
+        // Remember the original camera position for title transitions.
+        private Vector3 standingEyeLocalPosition;
+
+        public void SetCameraPivot(Transform pivot)
+        {
+            eye = pivot;
+
+            if (eye != null)
+                standingEyeLocalPosition = eye.localPosition;
+        }
+
         public void SetFreezeWalking(bool frozen)
         {
             freezeWalking = frozen;
-            if (frozen) horizontalVelocity = Vector3.zero;
+
+            if (frozen)
+                horizontalVelocity = Vector3.zero;
         }
 
         public void Teleport(Vector3 position, Quaternion facing)
         {
-            if (controller == null) controller = GetComponent<CharacterController>();
+            if (controller == null)
+                controller = GetComponent<CharacterController>();
+
             bool wasEnabled = controller.enabled;
-            if (wasEnabled) controller.enabled = false;
+
+            if (wasEnabled)
+                controller.enabled = false;
+
             transform.SetPositionAndRotation(position, facing);
-            if (wasEnabled) controller.enabled = true;
+
+            if (wasEnabled)
+                controller.enabled = true;
+
             pitch = 0f;
             verticalSpeed = 0f;
             horizontalVelocity = Vector3.zero;
             smoothLook = Vector2.zero;
             lookVelocity = Vector2.zero;
-            if (eye != null) eye.localRotation = Quaternion.identity;
+
+            if (eye != null)
+                eye.localRotation = Quaternion.identity;
+        }
+
+        // Used by KZTitleTransition to restore the player camera.
+        public void TeleportView(
+            Vector3 cameraPosition,
+            Quaternion cameraRotation)
+        {
+            if (eye == null)
+            {
+                Teleport(cameraPosition, cameraRotation);
+                return;
+            }
+
+            Vector3 forward =
+                cameraRotation * Vector3.forward;
+
+            float yaw = Mathf.Atan2(
+                forward.x,
+                forward.z
+            ) * Mathf.Rad2Deg;
+
+            float viewPitch = -Mathf.Asin(
+                Mathf.Clamp(forward.y, -1f, 1f)
+            ) * Mathf.Rad2Deg;
+
+            Quaternion bodyRotation =
+                Quaternion.Euler(0f, yaw, 0f);
+
+            // Assume the camera pivot is a direct child
+            // of the player, as in the original setup.
+            Vector3 eyeOffset = Vector3.Scale(
+                transform.lossyScale,
+                standingEyeLocalPosition
+            );
+
+            Vector3 rootPosition =
+                cameraPosition - bodyRotation * eyeOffset;
+
+            Teleport(rootPosition, bodyRotation);
+
+            // Restore the authored camera height after
+            // the cinematic title transition.
+            eye.localPosition = standingEyeLocalPosition;
+
+            pitch = Mathf.Clamp(
+                viewPitch,
+                -82f,
+                82f
+            );
+
+            eye.localRotation =
+                Quaternion.Euler(pitch, 0f, 0f);
         }
 
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+
             if (eye == null)
             {
-                Camera cameraChild = GetComponentInChildren<Camera>();
-                if (cameraChild != null) eye = cameraChild.transform;
+                Camera cameraChild =
+                    GetComponentInChildren<Camera>();
+
+                if (cameraChild != null)
+                    eye = cameraChild.transform;
             }
+
+            if (eye != null)
+                standingEyeLocalPosition = eye.localPosition;
         }
 
         private void Start()
@@ -61,23 +143,40 @@ namespace KongZuo
             SetCursor(true);
         }
 
-        private void OnDisable() { SetCursor(false); }
+        private void OnDisable()
+        {
+            SetCursor(false);
+        }
 
         private void OnApplicationFocus(bool focused)
         {
-            // Losing focus should never leave a locked, invisible cursor behind.
-            if (!focused) SetCursor(false);
+            // Losing focus should never leave a locked,
+            // invisible cursor behind.
+            if (!focused)
+                SetCursor(false);
         }
 
         private void Update()
         {
-            // Modal windows consume E/Esc. The player must not also unlock the cursor
+            // Modal windows consume E/Esc.
+            // The player must not unlock the cursor
             // on the same frame a journal or page closes.
-            if (KZHud.IsModal) return;
+            if (KZHud.IsModal)
+                return;
 
-            if (!KZPhotoAlignmentPuzzle.IsAnyActive && KZInput.ConsumeEscape())
-                SetCursor(Cursor.lockState != CursorLockMode.Locked);
-            else if (Cursor.lockState != CursorLockMode.Locked && KZInput.Click()) SetCursor(true);
+            if (!KZPhotoAlignmentPuzzle.IsAnyActive &&
+                KZInput.ConsumeEscape())
+            {
+                SetCursor(
+                    Cursor.lockState != CursorLockMode.Locked
+                );
+            }
+            else if (
+                Cursor.lockState != CursorLockMode.Locked &&
+                KZInput.Click())
+            {
+                SetCursor(true);
+            }
 
             if (Cursor.lockState != CursorLockMode.Locked)
             {
@@ -88,40 +187,91 @@ namespace KongZuo
             }
 
             Vector2 look = KZInput.Look() * sensitivity;
+
             if (lookSmoothTime > 0f)
-                look = Vector2.SmoothDamp(smoothLook, look, ref lookVelocity,
-                    lookSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
+            {
+                look = Vector2.SmoothDamp(
+                    smoothLook,
+                    look,
+                    ref lookVelocity,
+                    lookSmoothTime,
+                    Mathf.Infinity,
+                    Time.unscaledDeltaTime
+                );
+            }
+
             smoothLook = look;
 
-            transform.Rotate(Vector3.up, look.x, Space.Self);
-            pitch = Mathf.Clamp(pitch - look.y, -82f, 82f);
-            if (eye != null) eye.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+            transform.Rotate(
+                Vector3.up,
+                look.x,
+                Space.Self
+            );
 
-            if (controller == null || !controller.enabled) return;
+            pitch = Mathf.Clamp(
+                pitch - look.y,
+                -82f,
+                82f
+            );
+
+            if (eye != null)
+            {
+                eye.localRotation =
+                    Quaternion.Euler(pitch, 0f, 0f);
+            }
+
+            if (controller == null || !controller.enabled)
+                return;
 
             Vector3 desired = Vector3.zero;
+
             if (!freezeWalking)
             {
                 Vector2 axis = KZInput.Move();
-                Vector3 direction = transform.right * axis.x + transform.forward * axis.y;
-                float speed = walkSpeed * (KZInput.SprintHeld() ? sprintMultiplier : 1f);
+
+                Vector3 direction =
+                    transform.right * axis.x +
+                    transform.forward * axis.y;
+
+                float speed = walkSpeed *
+                    (KZInput.SprintHeld()
+                        ? sprintMultiplier
+                        : 1f);
+
                 desired = direction * speed;
             }
 
             horizontalVelocity = moveAcceleration <= 0f
                 ? desired
-                : Vector3.MoveTowards(horizontalVelocity, desired, moveAcceleration * Time.deltaTime);
-            if (freezeWalking) horizontalVelocity = Vector3.zero;
+                : Vector3.MoveTowards(
+                    horizontalVelocity,
+                    desired,
+                    moveAcceleration * Time.deltaTime
+                );
 
-            // Still apply gravity while walking is locked so actors cannot float.
-            if (controller.isGrounded && verticalSpeed < 0f) verticalSpeed = -1.5f;
+            if (freezeWalking)
+                horizontalVelocity = Vector3.zero;
+
+            // Apply gravity while walking is locked
+            // so actors cannot float.
+            if (controller.isGrounded && verticalSpeed < 0f)
+                verticalSpeed = -1.5f;
+
             verticalSpeed += gravity * Time.deltaTime;
-            controller.Move((horizontalVelocity + Vector3.up * verticalSpeed) * Time.deltaTime);
+
+            controller.Move(
+                (horizontalVelocity +
+                    Vector3.up * verticalSpeed)
+                * Time.deltaTime
+            );
         }
 
         private static void SetCursor(bool locked)
         {
-            Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.lockState = locked
+                ? CursorLockMode.Locked
+                : CursorLockMode.None;
+
             Cursor.visible = !locked;
         }
     }
